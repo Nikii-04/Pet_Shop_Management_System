@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetShop - Premium Pet Products</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-paw"></i> PetShop
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#footer">About</a></li>
+                <li><a href="#footer-section">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="cart.php" class="btn-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    Cart <span id="cartCount">0</span>
+                </a>
+                <div id="authArea"></div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to PetShop</h1>
+            <p>Premium Products for Your Beloved Pets</p>
+            <button class="btn btn-large"
+                onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">Shop Now</button>
+        </div>
+    </section>
+
+    <section id="products" class="products-section">
+        <div class="container">
+            <h2>Our Products</h2>
+            <div class="products-grid" id="productsGrid">
+            </div>
+        </div>
+    </section>
+    <section class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-truck"></i>
+                    <h3>Free Shipping</h3>
+                    <p>On orders above ₹500</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>Secure Payment</h3>
+                    <p>100% safe transactions</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-undo"></i>
+                    <h3>Easy Returns</h3>
+                    <p>30-day return policy</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-headset"></i>
+                    <h3>24/7 Support</h3>
+                    <p>Always here to help</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>About PetShop</h4>
+                    <p>Your trusted online pet store with premium products and excellent service.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#products">Products</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <p>Email: info@petshop.com</p>
+                    <p>Phone: +91 9876543210</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 PetShop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        fetch('api_session.php')
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                var authArea = document.getElementById('authArea');
+                if (data.isLoggedIn) {
+                    authArea.innerHTML =
+                        '<div class="user-menu">' +
+                        '<button class="btn-user"><i class="fas fa-user"></i> ' + data.userName + '</button>' +
+                        '<div class="dropdown-menu">' +
+                        '<a href="profile.php">My Profile</a>' +
+                        '<a href="orders.php">My Orders</a>' +
+                        '<a href="logout.php">Logout</a>' +
+                        '</div>' +
+                        '</div>';
+                } else {
+                    authArea.innerHTML =
+                        '<a href="login.php" class="btn btn-primary">Login</a>' +
+                        '<a href="register.php" class="btn btn-secondary">Register</a>';
+                }
+            });
+        fetch('api_products.php')
+            .then(function (res) { return res.json(); })
+            .then(function (products) {
+                var grid = document.getElementById('productsGrid');
+                var html = '';
+                for (var i = 0; i < products.length; i++) {
+                    var p = products[i];
+                    var desc = p.description.length > 80 ? p.description.substring(0, 80) + '...' : p.description;
+                    var price = parseFloat(p.price).toFixed(2);
+                    html +=
+                        '<div class="product-card">' +
+                        '<div class="product-image">' +
+                        '<img src="' + p.image + '" alt="' + p.name + '">' +
+                        '<span class="product-category">' + p.category + '</span>' +
+                        '</div>' +
+                        '<div class="product-info">' +
+                        '<h3>' + p.name + '</h3>' +
+                        '<p class="product-description">' + desc + '</p>' +
+                        '<div class="product-footer">' +
+                        '<span class="price">₹' + price + '</span>' +
+                        '<button class="btn btn-add-cart" onclick="addToCart(' + p.id + ', \'' + p.name.replace(/'/g, "\\'") + '\', ' + p.price + ')">' +
+                        '<i class="fas fa-shopping-cart"></i> Add' +
+                        '</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+                }
+                grid.innerHTML = html;
+            });
+    </script>
+    <script src="assets/js/cart.js"></script>
+</body>
+
+</html>
